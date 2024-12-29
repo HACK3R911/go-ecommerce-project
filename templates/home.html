@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интернет-магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .banner-section {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .banner-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-card {
+            background: #f4f4f4;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: #e44d26;
+        }
+
+        .section-title {
+            margin: 2rem 0 1rem;
+            font-size: 1.5rem;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <h1>Наш магазин</h1>
+            <div class="nav-links">
+                <a href="/">Главная</a>
+                <a href="/catalog">Каталог</a>
+                <a href="/cart">Корзина</a>
+                <a href="/account">Личный кабинет</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="banner-section">
+        <img src="{{.BannerImages}}" alt="Промо баннер" class="banner-image">
+    </section>
+
+    <main class="main-content">
+        <h2 class="section-title">Категории</h2>
+        <div class="categories">
+            {{range .Categories}}
+            <div class="category-card">
+                <h3>{{.}}</h3>
+            </div>
+            {{end}}
+        </div>
+
+        <h2 class="section-title">Популярные товары</h2>
+        <div class="products-grid">
+            {{range .FeaturedProducts}}
+            <div class="product-card">
+                <img src="{{.Image}}" alt="{{.ProductName}}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">{{.ProductName}}</h3>
+                    <p class="product-price">{{.Price}} ₽</p>
+                    <div class="product-rating">Рейтинг: {{.Rating}}/5</div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <h2 class="section-title">Новые поступления</h2>
+        <div class="products-grid">
+            {{range .NewArrivals}}
+            <div class="product-card">
+                <img src="{{.Image}}" alt="{{.ProductName}}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">{{.ProductName}}</h3>
+                    <p class="product-price">{{.Price}} ₽</p>
+                    <div class="product-rating">Рейтинг: {{.Rating}}/5</div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <h3>О компании</h3>
+                    <p>Контакты</p>
+                    <p>О нас</p>
+                    <p>Доставка</p>
+                </div>
+                <div>
+                    <h3>Помощь</h3>
+                    <p>Как сделать заказ</p>
+                    <p>Оплата</p>
+                    <p>Возврат</p>
+                </div>
+                <div>
+                    <h3>Контакты</h3>
+                    <p>Телефон: +7 (999) 999-99-99</p>
+                    <p>Email: info@shop.ru</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
