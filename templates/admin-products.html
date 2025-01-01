@@ -89,7 +89,7 @@
             </thead>
             <tbody>
                 {{range .Products}}
-                <tr>
+                <tr data-product-id="{{.Product_ID.Hex}}">
                     <td>
                         {{if .Image}}
                             <img src="{{.Image}}" alt="{{.Product_Name}}" class="product-image">
@@ -102,10 +102,10 @@
                     <td>{{.Rating}}/5</td>
                     <td>{{.Created_At.Format "02.01.2006 15:04"}}</td>
                     <td>
-                        <button class="action-btn edit-btn" onclick="editProduct('{{.Product_ID}}')">
+                        <button class="action-btn edit-btn" onclick="editProduct('{{.Product_ID.Hex}}')">
                             Редактировать
                         </button>
-                        <button class="action-btn delete-btn" onclick="deleteProduct('{{.Product_ID}}')">
+                        <button class="action-btn delete-btn" onclick="deleteProduct('{{.Product_ID.Hex}}')">
                             Удалить
                         </button>
                     </td>
@@ -120,17 +120,32 @@
             window.location.href = `/admin/products/${id}/edit`;
         }
 
-        function deleteProduct(id) {
+        function deleteProduct(productId) {
+            if (!productId || typeof productId !== 'string') {
+                alert('Ошибка: неверный ID товара');
+                return;
+            }
+
             if (confirm('Вы уверены, что хотите удалить этот товар?')) {
-                fetch(`/admin/products/${id}`, {
+                fetch(`/admin/products/${productId.trim()}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 })
                 .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Ошибка при удалении товара');
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.error || 'Ошибка при удалении товара');
+                        });
                     }
+                    return response.json();
+                })
+                .then(() => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert(error.message);
                 });
             }
         }

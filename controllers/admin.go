@@ -164,15 +164,29 @@ func (admin *AdminController) UpdateProduct() gin.HandlerFunc {
 func (admin *AdminController) DeleteProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		productID := c.Param("id")
-		objID, _ := primitive.ObjectIDFromHex(productID)
+		if productID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID продукта не указан"})
+			return
+		}
 
-		_, err := admin.prodCollection.DeleteOne(context.Background(), bson.M{"_id": objID})
+		objID, err := primitive.ObjectIDFromHex(productID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат ID"})
+			return
+		}
+
+		result, err := admin.prodCollection.DeleteOne(context.Background(), bson.M{"_id": objID})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка удаления продукта"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Продукт удален"})
+		if result.DeletedCount == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Продукт не найден"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Продукт успешно удален"})
 	}
 }
 
