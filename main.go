@@ -18,6 +18,7 @@ func main() {
 		port = "8000"
 	}
 	app := controllers.NewApplication(database.ProductData(database.Client, "Products"), database.UserData(database.Client, "Users"))
+	adminApp := controllers.NewAdminController(database.ProductData(database.Client, "Products"), database.UserData(database.Client, "Users"))
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -44,6 +45,21 @@ func main() {
 		protected.GET("/deleteaddresses", controllers.DeleteAddress())
 		protected.GET("/cartcheckout", app.BuyFromCart())
 		protected.GET("/instantbuy", app.InstantBuy())
+	}
+
+	router.GET("/admin/login", adminApp.LoginPage())
+	router.POST("/admin/login", adminApp.Login())
+
+	admin := router.Group("/admin")
+	admin.Use(middleware.Authentication(), middleware.AdminAuth())
+	{
+		admin.GET("/dashboard", adminApp.Dashboard())
+		admin.GET("/products", adminApp.Products())
+		admin.GET("/orders", adminApp.Orders())
+		admin.GET("/users", adminApp.Users())
+		admin.POST("/products", adminApp.CreateProduct())
+		admin.PUT("/products/:id", adminApp.UpdateProduct())
+		admin.DELETE("/products/:id", adminApp.DeleteProduct())
 	}
 
 	log.Fatal(router.Run(":" + port))

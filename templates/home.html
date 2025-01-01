@@ -120,6 +120,67 @@
             padding: 2rem;
             margin-top: 2rem;
         }
+
+        .user-cabinet {
+            position: relative;
+            padding: 10px;
+        }
+
+        .user-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .menu-item {
+            color: #333;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .cart-count {
+            background-color: #ff4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .welcome {
+            margin-right: 20px;
+            font-weight: 500;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            background-color: transparent;
+            border: 1px solid #007bff;
+            color: #007bff;
+        }
+
+        .btn-signup {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -130,7 +191,13 @@
                 <a href="/">Главная</a>
                 <a href="/catalog">Каталог</a>
                 <a href="/cart">Корзина</a>
-                <a href="/account">Личный кабинет</a>
+                {{if .User}}
+                    <a href="/profile">Личный кабинет</a>
+                    <a href="/logout">Выйти</a>
+                {{else}}
+                    <a href="/login" class="btn btn-login">Войти</a>
+                    <a href="/signup" class="btn btn-signup">Регистрация</a>
+                {{end}}
             </div>
         </nav>
     </header>

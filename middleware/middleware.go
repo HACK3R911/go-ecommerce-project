@@ -10,18 +10,25 @@ import (
 
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ClientToken := c.Request.Header.Get("token")
-		if ClientToken == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "No Authorization Header Provided"})
+		// Проверяем сначала куки
+		ClientToken, err := c.Cookie("admin_token")
+		if err != nil {
+			// Если куки нет, проверяем заголовок
+			ClientToken = c.Request.Header.Get("token")
+			if ClientToken == "" {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
+				c.Abort()
+				return
+			}
+		}
+
+		claims, msg := token.ValidateToken(ClientToken)
+		if msg != "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
 			c.Abort()
 			return
 		}
-		claims, err := token.ValidateToken(ClientToken)
-		if err != "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			c.Abort()
-			return
-		}
+
 		c.Set("email", claims.Email)
 		c.Set("uid", claims.Uid)
 		c.Next()

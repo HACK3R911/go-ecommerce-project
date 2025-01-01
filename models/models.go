@@ -21,6 +21,8 @@ type User struct {
 	UserCart        []ProductUser      `json:"usercart" bson:"usercart"`
 	Address_Details []Address          `json:"address" bson:"address"`
 	Order_Status    []Order            `json:"orders" bson:"orders"`
+
+	Is_Admin bool `json:"is_admin" bson:"is_admin"`
 }
 
 type Product struct {
@@ -29,7 +31,7 @@ type Product struct {
 	Price        *uint64            `json:"price"`
 	Rating       *uint8             `json:"rating"`
 	Image        *string            `json:"image"`
-	Created_At   time.Time         `json:"created_at" bson:"created_at"`
+	Created_At   time.Time          `json:"created_at" bson:"created_at"`
 }
 
 type ProductUser struct {
