@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавление товара</title>
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .specs-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .spec-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .spec-row input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-submit {
+            background: #2c3e50;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Добавление нового товара</h2>
+        <form id="productForm" onsubmit="submitForm(event)">
+            <div class="form-group">
+                <label>Название товара:</label>
+                <input type="text" name="product_name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea name="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Производитель:</label>
+                <input type="text" name="manufacturer" required>
+            </div>
+
+            <div class="form-group">
+                <label>Характеристики:</label>
+                <div id="specsContainer" class="specs-container">
+                    <div class="spec-row">
+                        <input type="text" placeholder="Название" required>
+                        <input type="text" placeholder="Значение" required>
+                        <button type="button" class="btn btn-remove" onclick="removeSpec(this)">Удалить</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-add" onclick="addSpec()">Добавить характеристику</button>
+            </div>
+
+            <div class="form-group">
+                <label>Цена:</label>
+                <input type="number" name="price" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Количество на складе:</label>
+                <input type="number" name="stock" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Изображение (URL):</label>
+                <input type="text" name="image">
+            </div>
+
+            <button type="submit" class="btn btn-submit">Добавить товар</button>
+        </form>
+    </div>
+
+    <script>
+        function addSpec() {
+            const container = document.getElementById('specsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'spec-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Название" required>
+                <input type="text" placeholder="Значение" required>
+                <button type="button" class="btn btn-remove" onclick="removeSpec(this)">Удалить</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeSpec(button) {
+            const row = button.parentElement;
+            if (document.getElementsByClassName('spec-row').length > 1) {
+                row.remove();
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const specs = {};
+            
+            document.querySelectorAll('.spec-row').forEach(row => {
+                const inputs = row.getElementsByTagName('input');
+                specs[inputs[0].value] = inputs[1].value;
+            });
+
+            const productData = {
+                product_name: form.product_name.value,
+                description: form.description.value,
+                manufacturer: form.manufacturer.value,
+                specifications: specs,
+                price: parseInt(form.price.value),
+                stock: parseInt(form.stock.value),
+                image: form.image.value
+            };
+
+            fetch('/admin/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/admin/products';
+                } else {
+                    alert('Ошибка при добавлении товара');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при добавлении товара');
+            });
+        }
+    </script>
+</body>
+</html> 

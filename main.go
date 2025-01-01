@@ -60,6 +60,7 @@ func main() {
 		admin.POST("/products", adminApp.CreateProduct())
 		admin.PUT("/products/:id", adminApp.UpdateProduct())
 		admin.DELETE("/products/:id", adminApp.DeleteProduct())
+		admin.GET("/products/new", adminApp.NewProductForm())
 	}
 
 	log.Fatal(router.Run(":" + port))

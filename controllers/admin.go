@@ -88,8 +88,8 @@ func (admin *AdminController) Products() gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin.html", gin.H{
-			"Content": gin.H{"Products": products},
+		c.HTML(http.StatusOK, "admin-products.html", gin.H{
+			"Products": products,
 		})
 	}
 }
@@ -118,8 +118,15 @@ func (admin *AdminController) CreateProduct() gin.HandlerFunc {
 			return
 		}
 
+		// Устанавливаем текущее время в МСК (UTC+3)
+		loc, err := time.LoadLocation("Europe/Moscow")
+		if err != nil {
+			loc = time.FixedZone("MSK", 3*60*60) // UTC+3 в секундах
+		}
 		product.Product_ID = primitive.NewObjectID()
-		_, err := admin.prodCollection.InsertOne(context.Background(), product)
+		product.Created_At = time.Now().In(loc)
+
+		_, err = admin.prodCollection.InsertOne(context.Background(), product)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания продукта"})
 			return
@@ -171,7 +178,11 @@ func (admin *AdminController) DeleteProduct() gin.HandlerFunc {
 
 func (admin *AdminController) LoginPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.HTML(http.StatusOK, "admin-login.html", nil)
+		// Получаем ошибку из query параметров, если она есть
+		errorMsg := c.Query("error")
+		c.HTML(http.StatusOK, "admin-login.html", gin.H{
+			"error": errorMsg,
+		})
 	}
 }
 
@@ -202,8 +213,14 @@ func (admin *AdminController) Login() gin.HandlerFunc {
 
 		token, refreshToken, _ := generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
 
-		c.SetCookie("admin_token", token, 3600, "/", "", false, true)
+		c.SetCookie("admin_token", token, 99999, "/", "", false, true)
 		c.SetCookie("refresh_token", refreshToken, 3600, "/", "", false, true)
 		c.Redirect(http.StatusSeeOther, "/admin/dashboard")
+	}
+}
+
+func (admin *AdminController) NewProductForm() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.HTML(http.StatusOK, "admin-product-form.html", nil)
 	}
 }

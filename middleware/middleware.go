@@ -16,17 +16,29 @@ func Authentication() gin.HandlerFunc {
 			// Если куки нет, проверяем заголовок
 			ClientToken = c.Request.Header.Get("token")
 			if ClientToken == "" {
-				c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
-				c.Abort()
-				return
+				if c.Request.URL.Path[:6] == "/admin" {
+					c.Redirect(http.StatusSeeOther, "/admin/login?error=Срок%20сессии%20истек")
+					c.Abort()
+					return
+				} else {
+					c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
+					c.Abort()
+					return
+				}
 			}
 		}
 
 		claims, msg := token.ValidateToken(ClientToken)
 		if msg != "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
-			c.Abort()
-			return
+			if c.Request.URL.Path[:6] == "/admin" {
+				c.Redirect(http.StatusSeeOther, "/admin/login?error=Срок%20сессии%20истек")
+				c.Abort()
+				return
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": msg})
+				c.Abort()
+				return
+			}
 		}
 
 		c.Set("email", claims.Email)
