@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование товара</title>
+    <style>
+        .edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        .preview-image {
+            max-width: 200px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-container">
+        <h2>Редактирование товара</h2>
+        
+        <form id="editProductForm">
+            <div class="form-group">
+                <label>ID товара</label>
+                <input type="text" value="{{.Product.Product_ID.Hex}}" readonly disabled>
+            </div>
+
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" name="product_name" value="{{if .Product.Product_Name}}{{.Product.Product_Name}}{{end}}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Описание</label>
+                <textarea name="description" required>{{.Product.Description}}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Производитель</label>
+                <input type="text" name="manufacturer" value="{{.Product.Manufacturer}}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Цена</label>
+                <input type="number" name="price" value="{{if .Product.Price}}{{.Product.Price}}{{end}}" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Количество на складе</label>
+                <input type="number" name="stock" value="{{if .Product.Stock}}{{.Product.Stock}}{{end}}" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Рейтинг</label>
+                <input type="number" name="rating" value="{{if .Product.Rating}}{{.Product.Rating}}{{end}}" min="0" max="5" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label>URL изображения</label>
+                <input type="text" name="image" value="{{.Product.Image}}">
+                {{if .Product.Image}}
+                <img src="{{.Product.Image}}" alt="Preview" class="preview-image">
+                {{end}}
+            </div>
+
+            <button type="submit" class="btn btn-save">Сохранить</button>
+            <a href="/admin/products" class="btn btn-cancel">Отмена</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('editProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const productId = '{{.Product.Product_ID.Hex}}';
+            
+            const data = {
+                product_name: formData.get('product_name'),
+                description: formData.get('description'),
+                manufacturer: formData.get('manufacturer'),
+                price: Number(formData.get('price')),
+                stock: Number(formData.get('stock')),
+                rating: Number(formData.get('rating')),
+                image: formData.get('image')
+            };
+
+            // Проверяем обязательные поля
+            if (!data.product_name || !data.price) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+
+            fetch(`/admin/products/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'Ошибка при обновлении товара');
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                window.location.href = '/admin/products';
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        });
+    </script>
+</body>
+</html>

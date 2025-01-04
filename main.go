@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"go-ecommerce-project/controllers"
@@ -57,11 +58,23 @@ func main() {
 		admin.GET("/products", adminApp.Products())
 		admin.GET("/orders", adminApp.Orders())
 		admin.GET("/users", adminApp.Users())
+
+		admin.GET("/products/new", adminApp.NewProductForm())
 		admin.POST("/products", adminApp.CreateProduct())
 		admin.PUT("/products/:id", adminApp.UpdateProduct())
+		admin.GET("/products/:id/edit", adminApp.EditProductForm())
 		admin.DELETE("/products/:id", adminApp.DeleteProduct())
-		admin.GET("/products/new", adminApp.NewProductForm())
+		admin.POST("/products/batch-delete", adminApp.DeleteMultipleProducts())
+
+		admin.DELETE("/users/:id", adminApp.DeleteUser())
+		admin.GET("/users/:id/edit", adminApp.EditUserForm())
+		admin.PUT("/users/:id", adminApp.UpdateUser())
+		admin.DELETE("/users/bulk-delete", adminApp.DeleteMultipleUsers())
 	}
+
+	router.GET("/signup", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "signup.html", nil)
+	})
 
 	log.Fatal(router.Run(":" + port))
 }

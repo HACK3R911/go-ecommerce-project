@@ -8,18 +8,20 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	email := "admin@test.com"
-	password := "admin"
-	firstName := "admin"
-	lastName := "admin"
+	email := "admin2@test.com"
+	password := "admin2"
+	firstName := "admin2"
+	lastName := "admin2"
 
 	hashedPassword := controllers.HashPassword(password)
 
 	admin := models.User{
+		ID:         primitive.NewObjectID(),
 		Email:      &email,
 		Password:   &hashedPassword,
 		First_Name: &firstName,
